@@ -13,6 +13,7 @@ from src.config.db import get_db, Base, engine
 # Import routers
 from src.users.user_routes import router as user_router
 from src.transactions.transaction_routes import router as transaction_router
+from src.transaction_items.transaction_items_routes import router as transaction_items_router
 
 # Import error handler
 from src.users.core.error_handler import format_error_response, format_validation_error_response
@@ -52,6 +53,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Include routers
 app.include_router(user_router)
 app.include_router(transaction_router)
+app.include_router(transaction_items_router)
 
 # CORS middleware configuration
 app.add_middleware(
