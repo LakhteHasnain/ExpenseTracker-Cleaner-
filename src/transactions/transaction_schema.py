@@ -21,6 +21,7 @@ class TransactionResponse(BaseModel):
     category:str = Field(...,description="Transaction category")
     user_id:UUID = Field(...,description="User ID")
     items: List['TransactionItemResponse'] = Field(default_factory=list, description="Transaction items")
+    images: List['ImageResponse'] = Field(default_factory=list, description="Transaction images")
 
 class TransactionUpdate(BaseModel):
    name:Optional[str] = Field(None,description="Transaction name")
@@ -31,4 +32,5 @@ class TransactionDelete(BaseModel):
     transaction_id:UUID = Field(...,description="Transaction ID")
 
 from src.transaction_items.transaction_items_schema import TransactionItemResponse
+from src.images.image_schema import ImageResponse
 TransactionResponse.model_rebuild()

@@ -7,7 +7,8 @@ A beginner-friendly backend project for tracking personal expenses, built with P
 This Expense Tracker allows users to:
 - Create and manage their accounts
 - Track their expenses by category
-- Manage transactions
+- Manage transactions with attached items
+- Upload and manage transaction images via ImgBB
 - Authenticate securely using JWT tokens
 
 ## Technical Stack
@@ -17,15 +18,26 @@ This Expense Tracker allows users to:
 - **ORM**: SQLAlchemy
 - **Migration Tool**: Alembic
 - **Authentication**: JWT (JSON Web Tokens)
+- **Image Storage**: ImgBB API
 
 ## Project Structure
 
 ```
 src/
-├── app.py                  # Main application entry point
 ├── config/                 # Configuration settings
 │   ├── db.py              # Database configuration
 │   └── rate_limit.py      # Rate limiting configuration
+├── images/                # Image management
+│   ├── image_controller.py
+│   ├── image_model.py
+│   ├── image_route.py
+│   ├── image_schema.py
+│   └── imgbb_service.py   # ImgBB API integration
+├── transaction_items/     # Transaction items management
+│   ├── transaction_items_controller.py
+│   ├── transaction_items_model.py
+│   ├── transaction_items_schema.py
+│   └── transaction_items_routes.py
 ├── transactions/          # Transaction management
 │   ├── transaction_controller.py
 │   ├── transaction_model.py
@@ -36,11 +48,7 @@ src/
 │   ├── user_model.py
 │   ├── user_routes.py
 │   └── user_schema.py
-│   ├── core/             # Core functionalities
-│   │   ├── jwt_token.py
-│   │   └── user_password_hash.py
-│   └── services/         # Business logic services
-└── utils/                # Utility functions
+└── app.py                 # Main application entry point
 ```
 
 ## Key Features
@@ -57,12 +65,22 @@ src/
    - Categorize expenses
    - Track transaction amounts
    - Link transactions to specific users
+   - Attach multiple items to transactions
+   - Upload and associate images with transactions
 
-3. **Security Features**
+3. **Image Management**
+   - Upload images to ImgBB cloud storage
+   - Upload images from URLs
+   - Associate images with transactions
+   - Delete images
+   - Automatic image expiration support
+
+4. **Security Features**
    - Password hashing
    - JWT authentication
    - Rate limiting
    - Token blacklisting
+   - All endpoints require JWT authentication
 
 ## Database Models
 
@@ -84,6 +102,32 @@ class Transaction:
     - amount (Integer)
     - category (String)
     - user_id (UUID, foreign key)
+    - items (relationship to TransactionItems)
+    - images (relationship to Images)
+```
+
+### Transaction Items Model
+```python
+class TransactionItems:
+    - item_id (UUID, primary key)
+    - transaction_id (UUID, foreign key)
+    - item_name (String)
+    - item_quantity (Integer)
+    - item_price (Float)
+```
+
+### Image Model
+```python
+class Image:
+    - image_id (UUID, primary key)
+    - transaction_id (UUID, foreign key)
+    - imgbb_image_id (String)
+    - display_url (String)
+    - delete_url (String)
+    - filename (String)
+    - mime (String)
+    - size (Integer)
+    - expiration (Integer, optional)
 ```
 
 ## Getting Started
@@ -110,7 +154,10 @@ Create a `.env` file with:
 ```
 DATABASE_URL=postgresql://[username]:[password]@localhost:5432/expense_tracker
 JWT_SECRET_KEY=[your-secret-key]
+IMAGE_API_KEY=[your-imgbb-api-key]
 ```
+
+To get an ImgBB API key, visit: https://imgbb.com/api
 
 5. **Run migrations**
 ```bash
@@ -119,8 +166,41 @@ alembic upgrade head
 
 6. **Start the server**
 ```bash
+python server.py
+```
+or
+```bash
 uvicorn src.app:app --reload
 ```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/v1/auth/register` - Register a new user
+- `POST /api/v1/auth/login` - Login user
+- `POST /api/v1/auth/refresh` - Refresh JWT token
+- `POST /api/v1/auth/logout` - Logout user
+
+### Transactions
+- `POST /api/v1/transactions/` - Create transaction (supports multipart/form-data with images)
+- `GET /api/v1/transactions/` - Get all transactions
+- `GET /api/v1/transactions/{transaction_id}` - Get specific transaction
+- `PUT /api/v1/transactions/{transaction_id}` - Update transaction
+- `DELETE /api/v1/transactions/{transaction_id}` - Delete transaction
+
+### Transaction Items
+- `POST /api/v1/transaction-items/` - Create transaction item
+- `GET /api/v1/transaction-items/` - Get all items
+- `GET /api/v1/transaction-items/{item_id}` - Get specific item
+- `PUT /api/v1/transaction-items/{item_id}` - Update item
+- `DELETE /api/v1/transaction-items/{item_id}` - Delete item
+
+### Images
+- `POST /api/v1/images/upload` - Upload image file
+- `POST /api/v1/images/upload-url` - Upload image from URL
+- `GET /api/v1/images/{image_id}` - Get image details
+- `GET /api/v1/images/transaction/{transaction_id}` - Get all images for a transaction
+- `DELETE /api/v1/images/{image_id}` - Delete image
 
 ## Learning Objectives
 
@@ -133,6 +213,8 @@ This project demonstrates:
 - Rate limiting
 - Error handling
 - Service layer architecture
+- Third-party API integration (ImgBB)
+- Multipart form data handling
 
 ## API Documentation
 

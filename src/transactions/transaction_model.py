@@ -11,3 +11,4 @@ class Transaction(Base):
     category= Column(String(50),nullable=False)
     user_id= Column(UUID(as_uuid=True), ForeignKey("users.user_id"), nullable=False)
     items = relationship("TransactionItem", back_populates="transaction")
+    images = relationship("Image", back_populates="transaction")
