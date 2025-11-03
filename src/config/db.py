@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv('C:\\Users\\PMLS\\Desktop\\Dev Takeaways\\backend\\ExpenseTracker(Cleaner)\\.env')
+load_dotenv('C:\\Users\\PMLS\\Desktop\\Dev\\backend\\ExpenseTracker(Cleaner)\\.env')
 
 # Database connection URL
 DATABASE_URL = f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
